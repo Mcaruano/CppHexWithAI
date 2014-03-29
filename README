@@ -1,0 +1,25 @@
+-Author: Matt Caruano
+-threadedHexGame.cpp: Provides code for running time analyis on threaded vs. unthreaded, as well as code for a complete game of Hex vs. the AI.
+-threadedHex.h: Provides functions for construction of a Hex game, an overloaded << operator, and two methods for making AI moves: one utilizing threading, the other without.
+-threadedHex.cpp: Implements threadedHex.h
+-GameFinale.png: Some screenshots of the finale of a game I lost against my AI
+
+//********************************************************
+IMPORTANT: This does NOT compile on many UNIX environments due to a bug in g++ 4.8.1. This compiles and runs successfully on Windows environments
+Threading using the <thread> library works like this: You make a thread, you give it a function to run on that thread, and then you pass it the arguments like so:
+thread t1(function, arg1, arg2)
+BUT if your function passes an argument by reference, say, a vector that you want it to modify, you HAVE to wrap that argument in ref() from the std namespace. So if arg1 was an int you were passing in that you wanted 'function' to modify, you would have to declare the thread this way:
+thread t1(function, ref(arg1), arg2)
+
+Here is a more thorough explanation from StackOverFlow if you want to check out the syntax further:
+http://stackoverflow.com/questions/5116756/difference-between-pointer-and-reference-as-thread-parameter
+
+HOWEVER, in g++ 4.8.2 and g++ 4.8.1, it is a documented issue that ref() wrappers in arguments to threads created using the new <thread> library do not function properly, and throw compiler errors. I found an official error report of this in the gcc-bugs@gcc.gnu.org mailing list archives:
+http://gcc.gnu.org/ml/gcc-bugs/2014-01/msg01214.html
+//********************************************************
+
+Run-Time Analysis:
+Each move was calculated using 1000 simulations for every single available board position (Up to 120,000 simulated games per individual move), and determining which position was more likely to win based on a randomly generated game.
+-Un-threaded AI move took 135.029 seconds to calculate
+-Threaded AI move took 45.349 seconds to calculate
+So threading improved the performance of my AI by 298%, or almost 3x!
